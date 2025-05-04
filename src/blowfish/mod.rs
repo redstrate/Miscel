@@ -7,14 +7,14 @@ use constants::{BLOWFISH_P, BLOWFISH_S};
 const ROUNDS: usize = 16;
 
 /// Implementation of the Blowfish block cipher, specialized for encrypting and decrypting Steam tickets in the launcher. This is somehow *different* than the one used with SqexArg.
-pub struct Blowfish {
+pub struct SteamTicketBlowfish {
     p: [u32; 18],
     s: [[u32; 256]; 4],
 }
 
-impl Blowfish {
+impl SteamTicketBlowfish {
     /// Initializes a new Blowfish session with a key.
-    pub fn new(key: &[u8]) -> Blowfish {
+    pub fn new(key: &[u8]) -> Self {
         let mut s = Self {
             p: BLOWFISH_P,
             s: BLOWFISH_S,
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_encrypt_decrypt() {
-        let blowfish = Blowfish::new(b"00000000#un@e=x>");
+        let blowfish = SteamTicketBlowfish::new(b"00000000#un@e=x>");
 
         let mut data = [
             8, 187, 54, 57, 54, 52, 55, 53, 54, 56, 54, 97, 55, 53, 54, 49, 54, 52, 51, 56, 51, 57,
