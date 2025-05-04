@@ -5,6 +5,7 @@ Small, miscellaneous functions that are useful for writing FFXIV launchers. Such
 * Looking up the frontier URL and other useful strings.
 * Locating existing game directories.
 * Installing the game without having to run the InstallShield installer.
+* The special variant of ECB Blowfish encryption used for Steam Ticket encryption.
 
 ## License
 
