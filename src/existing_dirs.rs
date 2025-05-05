@@ -9,6 +9,9 @@ use std::fs;
 use std::fs::read_dir;
 use std::path::PathBuf;
 
+use physis::common::Platform;
+use physis::gamedata::GameData;
+
 /// Where the existing installation came from
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -31,6 +34,22 @@ pub struct ExistingGameDirectory {
     pub install_type: ExistingInstallType,
     /// The path to the "main folder" where "game" and "boot" sits
     pub path: String,
+    /// The latest expansion and game version in this directory.
+    pub version: String,
+}
+
+fn read_version(path: &str) -> String {
+    let mut path = PathBuf::from(path);
+    path.push("game");
+    let path = path.to_str().unwrap().to_string();
+
+    let game_data = GameData::from_existing(Platform::Win32, &path);
+
+    if let Some(latest_repository) = game_data.repositories.last() {
+        return latest_repository.version.clone().unwrap_or_default();
+    }
+
+    String::default()
 }
 
 /// Finds existing installations on disk. Will only return locations that actually have files in them, and a really basic check to see if the data is valid.
@@ -39,25 +58,27 @@ pub fn find_existing_game_dirs() -> Vec<ExistingGameDirectory> {
 
     match std::env::consts::OS {
         "linux" => {
-            // Official install (Wine)
-            install_dirs.push(ExistingGameDirectory {
-                install_type: ExistingInstallType::OfficialLauncher,
-                path: from_home_dir(".wine/drive_c/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn")
-            });
-
             // Official install (Steam)
-            install_dirs.push(ExistingGameDirectory {
-                install_type: ExistingInstallType::OfficialLauncher,
-                path: from_home_dir(
+            {
+                let path = from_home_dir(
                     ".steam/steam/steamapps/common/FINAL FANTASY XIV - A Realm Reborn",
-                ),
-            });
+                );
+                install_dirs.push(ExistingGameDirectory {
+                    install_type: ExistingInstallType::OfficialLauncher,
+                    path: path.clone(),
+                    version: read_version(&path),
+                });
+            }
 
             // XIVLauncherCore location
-            install_dirs.push(ExistingGameDirectory {
-                install_type: ExistingInstallType::XIVLauncherCore,
-                path: from_home_dir(".xlcore/ffxiv"),
-            });
+            {
+                let path = from_home_dir(".xlcore/ffxiv");
+                install_dirs.push(ExistingGameDirectory {
+                    install_type: ExistingInstallType::XIVLauncherCore,
+                    path: path.clone(),
+                    version: read_version(&path),
+                });
+            }
 
             // Astra location. But we have to iterate through each UUID.
             if let Ok(entries) = read_dir(from_home_dir(".local/share/astra/game/")) {
@@ -73,30 +94,44 @@ pub fn find_existing_game_dirs() -> Vec<ExistingGameDirectory> {
                         vec![]
                     })
                     .for_each(|path| {
+                        let path = path.to_str().unwrap().to_string();
+                        let version = read_version(&path);
+
                         install_dirs.push(ExistingGameDirectory {
                             install_type: ExistingInstallType::Astra,
-                            path: path.into_os_string().into_string().unwrap(),
+                            path,
+                            version,
                         })
                     });
             }
         }
         "macos" => {
             // Official Launcher (macOS)
-            install_dirs.push(ExistingGameDirectory {
-                install_type: ExistingInstallType::OfficialLauncher,
-                path: from_home_dir("Library/Application Support/FINAL FANTASY XIV ONLINE/Bottles/published_Final_Fantasy/drive_c/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn")
-            });
+            {
+                let path = from_home_dir(
+                    "Library/Application Support/FINAL FANTASY XIV ONLINE/Bottles/published_Final_Fantasy/drive_c/Program Files (x86)/SquareEnix/FINAL FANTASY XIV - A Realm Reborn",
+                );
+                install_dirs.push(ExistingGameDirectory {
+                    install_type: ExistingInstallType::OfficialLauncher,
+                    path: path.clone(),
+                    version: read_version(&path),
+                });
+            }
 
             // TODO: add XIV on Mac
         }
         "windows" => {
             // Official install (Wine)
-            install_dirs.push(ExistingGameDirectory {
-                install_type: ExistingInstallType::OfficialLauncher,
-                path: "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn"
-                    .parse()
-                    .unwrap(),
-            });
+            {
+                let path =
+                    "C:\\Program Files (x86)\\SquareEnix\\FINAL FANTASY XIV - A Realm Reborn"
+                        .to_string();
+                install_dirs.push(ExistingGameDirectory {
+                    install_type: ExistingInstallType::OfficialLauncher,
+                    path: path.clone(),
+                    version: read_version(&path),
+                });
+            }
 
             // TODO: Add Astra
         }
@@ -106,6 +141,7 @@ pub fn find_existing_game_dirs() -> Vec<ExistingGameDirectory> {
     install_dirs
         .into_iter()
         .filter(|dir| is_valid_game_dir(&dir.path))
+        .filter(|dir| !dir.version.is_empty())
         .collect()
 }
 

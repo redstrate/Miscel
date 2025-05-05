@@ -17,3 +17,4 @@ default = []
 game_install = []
 
 [dependencies]
+physis = { git = "https://github.com/redstrate/Physis" }
