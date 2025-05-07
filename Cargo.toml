@@ -4,17 +4,5 @@ version = "0.1.0"
 edition = "2024"
 license = "MIT"
 
-[build-dependencies]
-system-deps = "7"
-
-[package.metadata.system-deps]
-libunshield = { version = "1.4", feature = "game_install" }
-
-[features]
-default = []
-
-# enables game installation support using unshield (only supported on Linux and macOS)
-game_install = []
-
 [dependencies]
 physis = { git = "https://github.com/redstrate/Physis" }
