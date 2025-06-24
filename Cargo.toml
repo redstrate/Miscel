@@ -5,4 +5,4 @@ edition = "2024"
 license = "MIT"
 
 [dependencies]
-physis = { git = "https://github.com/redstrate/Physis" }
+physis = "0.4"
