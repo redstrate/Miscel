@@ -3,6 +3,10 @@ name = "miscel"
 version = "0.1.0"
 edition = "2024"
 license = "MIT"
+description = "Small, miscellaneous functions that are useful for writing FFXIV launchers."
+keywords = ["ffxiv", "modding"]
+repository = "https://github.com/redstrate/Miscel"
+authors = ["Joshua Goins <josh@redstrate.com>"]
 
 [dependencies]
 physis = "0.4"
