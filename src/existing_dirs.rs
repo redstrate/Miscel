@@ -9,7 +9,6 @@ use std::fs;
 use std::fs::read_dir;
 use std::path::PathBuf;
 
-use physis::common::Platform;
 use physis::resource::SqPackResource;
 
 /// Where the existing installation came from
@@ -43,7 +42,7 @@ fn read_version(path: &str) -> String {
     path.push("game");
     let path = path.to_str().unwrap().to_string();
 
-    let game_data = SqPackResource::from_existing(Platform::Win32, &path);
+    let game_data = SqPackResource::from_existing(&path);
 
     if let Some(latest_repository) = game_data.repositories.last() {
         return latest_repository.version.clone().unwrap_or_default();
