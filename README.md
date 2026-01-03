@@ -1,5 +1,7 @@
 # Miscel
 
+**NOTE:** This library's API has been integrated into [Physis](https://crates.io/crates/physis), making this obsolete.
+
 Small, miscellaneous functions that are useful for writing FFXIV launchers. Such as:
 
 * Looking up the frontier URL and other useful strings.
