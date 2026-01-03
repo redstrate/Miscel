@@ -1,6 +1,6 @@
 # Miscel
 
-**NOTE:** This library's API has been integrated into [Physis](https://crates.io/crates/physis), making this obsolete.
+**NOTE:** Miscel has been integrated into [Physis](https://crates.io/crates/physis) 0.6, which will make this library obsolete.
 
 Small, miscellaneous functions that are useful for writing FFXIV launchers. Such as:
 
